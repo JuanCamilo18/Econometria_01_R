@@ -1,0 +1,149 @@
+---
+title: "Introducción a la Econometria"
+author: "Juan Panta I."
+date: "2023-05-09"
+output:
+  #rmdformats::downcute:
+  rmdformats::readthedown:
+  html_document:
+    number_sections: 2
+    toc: TRUE
+    toc_float: TRUE
+    #theme: journal
+    highlight: pygments
+    code_folding: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## El modelo de regresión lineal simple
+
+### El modelo general
+
+Un modelo de regresión lineal simple supone que existe una relación lineal entre la expectativa condicional de una **variable dependiente**, $y$, y una **variable independiente**, $X$.
+
+A veces llamamos 
+
+| variable independiente | variables independientes|
+| --- | --- |
+|'respuesta' | 'regresores' |
+|'variable de respuesta'| |
+
+La relación supuesta en un modelo de regresión lineal tiene la forma
+
+$$y_i=β_1+β_2*x_i+e_i   \hspace{40pt}................................(1)$$
+donde:
+
+- $y$ : es la variable dependiente
+
+- $x$ : es la variable independiente
+
+- $e$ : es un termino de error
+
+- $\sigma^2$ : es la varianza del término de error
+
+- $β_1$ :  es el parametro de intercepción o coeficiente
+
+- $β_2$ : es el parametro de pendiente o coeficiente
+
+- $i$ : representa la i -ésima observación en el conjunto de datos, i = 1 , 2 , . . . , N
+
+- $N$ : es el número de observaciones en el conjunto de datos.
+
+
+El valor predicho o estimado de y dado X está dada por la ecuación 2; en general, el símbolo del sombrero indica un valor estimado o predicho.
+
+$$\hat{y} = b_1 + b_2 *x   \hspace{40pt}................................(2)$$
+
+El modelo de regresión lineal simple supone que los valores de X son elegidos previamente (por lo tanto, no son aleatorios), que la varianza del término de error, $\sigma^2$, es el mismo para todos los valores de X, y que no hay conexión entre una observación y otra (no hay correlación entre los términos de error de dos observaciones). Además, se supone que el valor esperado del término de error para cualquier valor de $X$ es cero
+
+El subíndice i en la ecuación 1 indica que la relación se aplica a cada uno de los N observaciones. Por lo tanto, debe haber valores específicos de y, X, e para cada observación. Sin embargo, dado que x no es aleatorio, normalmente hay varias observaciones que comparten la misma x , como muestra el diagrama de dispersión de la Figura 2.1.
+
+```{r }
+library(PoEdata)
+data("cps_small")
+plot(cps_small$educ, cps_small$wage, 
+     xlab="education", ylab="wage")
+```
+
+### Ejemplo: gasto en alimentos versus ingresos
+
+Los datos de este ejemplo se almacenan en el paquete PoEdata de R.
+
+```{r render = pander::pander}
+library(PoEdata)
+data(food)
+head(food)
+```
+
+Siempre es una buena idea inspeccionar visualmente los datos en un diagrama de dispersión, que se puede crear utilizando la plot(). La figura 2.2 es un diagrama disperso del gasto en alimentos sobre los ingresos, lo que sugiere que existe una relación positiva entre los ingresos y el gasto en alimentos.
+
+
+```{r}
+data("food", package="PoEdata")
+plot(food$income, food$food_exp, 
+     ylim=c(0, max(food$food_exp)),
+     xlim=c(0, max(food$income)),
+     xlab="weekly income in $100", 
+     ylab="weekly food expenditure in $", 
+     type = "p")
+```
+
+### Estimación de una regresión lineal
+
+La función R para estimar un modelo de regresión lineal es `lm(y~x, data)`.
+
+Es útil dar un nombre al modelo, como mod1, y luego mostrar los resultados usando `summary(mod1)`. Si está interesado solo en algunos de los resultados de la regresión, como los coeficientes estimados, puede recuperarlos utilizando funciones específicas, como la función `coef()`. Para los datos de gasto alimentario, el modelo de regresión será:
+
+$$foodexp = β_1+β_2*income+e $$
+
+donde el subíndice i se ha omitido por simplicidad
+
+
+
+```{r}
+library(PoEdata)
+mod1 <- lm(food_exp ~ income, data = food)
+b1 <- coef(mod1)[[1]]
+b2 <- coef(mod1)[[2]]
+smod1 <- summary(mod1)
+smod1
+```
+
+
+La función coef() devuelve una lista que contiene los coeficientes estimados, donde se puede acceder a un coeficiente específico mediante su posición en la lista.Por ejemplo, el valor estimado de β1 es b1 <- coef(mod1)[[1]], que es igual a 83.416002, y el valor estimado de β2 es bb2 <- coef(mod1)[[2]], que es igual a 10.209643.
+
+El parámetro de intercepción,  β1, suele tener poca importancia en los modelos econométricos; Estamos interesados principalmente en el parámetro de pendiente,  β2. El valor estimado de  β2  sugiere que el gasto en alimentos para una familia promedio aumenta en 10.209643 cuando el ingreso familiar aumenta en 1 unidad, que en este caso es de $ 100. El function abline() agrega la línea de regresion al diagrama de dispersión previamente trazado, como muestra la Figura 2.3.
+
+```{r}
+plot(food$income, food$food_exp, 
+     xlab="weekly income in $100", 
+     ylab="weekly food expenditure in $", 
+     type = "p")
+abline(b1,b2)
+```
+
+
+¿Cómo se pueden recuperar varios resultados de regresión? Estos resultados existen en dos objetos R producidos por la función lm() el objeto de regresión, como mod1 en la secuencia de código anterior, y el resumen de regresión, que denoté por smod1. El código siguiente muestra cómo enumerar los nombres de todos los resultados de cada objeto.
+
+```{r}
+names(mod1)
+names(smod1)
+```
+
+Para recuperar un resultado en particular, simplemente refiérase a él con el nombre del objeto, seguido del signo $\$$ y el nombre del resultado que desea recuperar. Por ejemplo, si queremos el vector de coeficientes de mod1, nos referimos a él como `mod1$coefficients` y `smod1$coefficients` `mod1$coefficients`:
+
+```{r}
+mod1$coefficients
+```
+
+
+```{r}
+smod1$coefficients
+```
+
+Sin embargo, como hemos visto antes, algunos de estos resultados se pueden recuperar utilizando funciones específicas, como coef (mod1), resid(mod1) (mod1), fitted(mod1), vcov(mod1), coef(mod1), fitted(mod1).
+
+
