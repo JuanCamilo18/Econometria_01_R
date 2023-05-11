@@ -97,7 +97,7 @@ La función R para estimar un modelo de regresión lineal es `lm(y~x, data)`.
 
 Es útil dar un nombre al modelo, como mod1, y luego mostrar los resultados usando `summary(mod1)`. Si está interesado solo en algunos de los resultados de la regresión, como los coeficientes estimados, puede recuperarlos utilizando funciones específicas, como la función `coef()`. Para los datos de gasto alimentario, el modelo de regresión será:
 
-$$foodexp = β_1+β_2*income+e $$
+$$foodexp = β_1+β_2*income+e \hspace{40pt}................................(3)$$
 
 donde el subíndice i se ha omitido por simplicidad
 
@@ -145,5 +145,26 @@ smod1$coefficients
 ```
 
 Sin embargo, como hemos visto antes, algunos de estos resultados se pueden recuperar utilizando funciones específicas, como coef (mod1), resid(mod1) (mod1), fitted(mod1), vcov(mod1), coef(mod1), fitted(mod1).
+
+
+### Predicción con el Modelo de Regresión Lineal
+
+Los parámetros de regresión estimados, $b_1$ y $b_2$ nos permiten predecir el gasto alimentario esperado para cualquier ingreso dado. Todo lo que necesitamos hacer es conectar los valores de los parámetros estimados y el ingreso dado en una ecuación como Ecuación  2. Por ejemplo, el valor esperado de  food_exp  para un ingreso de $2000 se calcula en la Ecuación  4. (Recuerde dividir el ingreso por 100, ya que los datos para la variable  income  está en cientos de dólares)
+
+$$\hat{foodexp} = 83.416002 + 10.209643∗20 = 287.608861 \hspace{40pt}................................(4)$$
+
+R, sin embargo, hace estos cálculos por nosotros con su función llamada predict(). Extendamos ligeramente el ejemplo a más de un ingreso para el cual predecimos el gasto en alimentos, digamos ingresos = $\$$ 2000, $\$$ 2500 y $\$$ 2700. La función predict() en R requiere que los nuevos valores de las variables independientes se organicen bajo una forma particular, llamada marco de datos. Incluso cuando solo queremos predecir un ingreso, necesitamos la misma estructura de marco de datos. En R, un conjunto de números se mantiene unido usando la estructura c(). La siguiente secuencia muestra este ejemplo.
+
+```{r}
+# library(PoEdata) (load the data package if you have not done so yet)
+mod1 <- lm(food_exp~income, data=food)
+newx <- data.frame(income = c(20, 25, 27))
+yhat <- predict(mod1, newx)
+names(yhat) <- c("income=$2000", "$2500", "$2700") 
+yhat  # prints the result
+```
+
+
+
 
 

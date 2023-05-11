@@ -1431,7 +1431,8 @@ algunos de los resultados de la regresión, como los coeficientes
 estimados, puede recuperarlos utilizando funciones específicas, como la
 función <code>coef()</code>. Para los datos de gasto alimentario, el
 modelo de regresión será:</p>
-<p><span class="math display">\[foodexp = β_1+β_2*income+e \]</span></p>
+<p><span class="math display">\[foodexp = β_1+β_2*income+e
+\hspace{40pt}................................(3)\]</span></p>
 <p>donde el subíndice i se ha omitido por simplicidad</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(PoEdata)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(food_exp <span class="sc">~</span> income, <span class="at">data =</span> food)</span>
@@ -1504,6 +1505,36 @@ nos referimos a él como <code>mod1$coefficients</code> y
 pueden recuperar utilizando funciones específicas, como coef (mod1),
 resid(mod1) (mod1), fitted(mod1), vcov(mod1), coef(mod1),
 fitted(mod1).</p>
+</div>
+<div id="predicción-con-el-modelo-de-regresión-lineal" class="section level3">
+<h3>Predicción con el Modelo de Regresión Lineal</h3>
+<p>Los parámetros de regresión estimados, <span class="math inline">\(b_1\)</span> y <span class="math inline">\(b_2\)</span> nos permiten predecir el gasto
+alimentario esperado para cualquier ingreso dado. Todo lo que
+necesitamos hacer es conectar los valores de los parámetros estimados y
+el ingreso dado en una ecuación como Ecuación 2. Por ejemplo, el valor
+esperado de food_exp para un ingreso de $2000 se calcula en la Ecuación
+4. (Recuerde dividir el ingreso por 100, ya que los datos para la
+variable income está en cientos de dólares)</p>
+<p><span class="math display">\[\hat{foodexp} = 83.416002 + 10.209643∗20
+= 287.608861
+\hspace{40pt}................................(4)\]</span></p>
+<p>R, sin embargo, hace estos cálculos por nosotros con su función
+llamada predict(). Extendamos ligeramente el ejemplo a más de un ingreso
+para el cual predecimos el gasto en alimentos, digamos ingresos = <span class="math inline">\(\$\)</span> 2000, <span class="math inline">\(\$\)</span> 2500 y <span class="math inline">\(\$\)</span> 2700. La función predict() en R
+requiere que los nuevos valores de las variables independientes se
+organicen bajo una forma particular, llamada marco de datos. Incluso
+cuando solo queremos predecir un ingreso, necesitamos la misma
+estructura de marco de datos. En R, un conjunto de números se mantiene
+unido usando la estructura c(). La siguiente secuencia muestra este
+ejemplo.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># library(PoEdata) (load the data package if you have not done so yet)</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>mod1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(food_exp<span class="sc">~</span>income, <span class="at">data=</span>food)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>newx <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">income =</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">25</span>, <span class="dv">27</span>))</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>yhat <span class="ot">&lt;-</span> <span class="fu">predict</span>(mod1, newx)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(yhat) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;income=$2000&quot;</span>, <span class="st">&quot;$2500&quot;</span>, <span class="st">&quot;$2700&quot;</span>) </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>yhat  <span class="co"># prints the result</span></span></code></pre></div>
+<pre><code>## income=$2000        $2500        $2700 
+##     287.6089     338.6571     359.0764</code></pre>
 </div>
 </div>
 </div>
