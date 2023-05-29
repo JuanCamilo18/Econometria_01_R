@@ -193,6 +193,121 @@ print(sumb2/C, digits = 3)
 The result,  $b_2$=  9.88, is the average of 50 estimates of  $b_2$.
 
 
+### Varianzas estimadas y covarianza de los coeficientes de regresión
+
+Muchas aplicaciones requieren estimaciones de las varianzas y covarianzas de los coeficientes de regresión. R los almacena en la matriz `vcov()`:
+
+
+```{r}
+(varb1 <- vcov(mod1)[1, 1])
+(varb2 <- vcov(mod1)[2, 2])
+
+(covb1b2 <- vcov(mod1)[1,2])
+```
+
+
+### Relaciones no lineales
+
+A veces, el diagrama de diagrama de dispersión o algunas consideraciones teóricas sugieren una relación no lineal. Las relaciones no lineales más populares implican logaritmos de las variables dependientes o independientes y funciones polinómicas.
+
+El modelo cuadrático requiere el cuadrado de la variable independiente.
+
+$$y_i = \beta_1+\beta_{2} x_{i}^{2} + e_i \hspace{35pt}................................(5)$$
+
+En R, las variables independientes que involucran operadores matemáticos pueden incluirse en una ecuación de regresión con la función `I()`. En el ejemplo siguiente se utiliza el dataset `br` del paquete *PoEdata*, que incluye los precios de venta y los atributos de 1080 casas en Baton Rouge, LA. `price` precio es el precio de venta en dólares, y `sqft` es el área de superficie en pies cuadrados.
+
+
+```{r}
+library(PoEdata)
+data(br)
+mod3 <- lm(price~I(sqft^2), data=br)
+b1 <- coef(mod3)[[1]]
+b2 <- coef(mod3)[[2]]
+sqftx=c(2000, 4000, 6000) #given values for sqft
+pricex=b1+b2*sqftx^2 #prices corresponding to given sqft 
+DpriceDsqft <- 2*b2*sqftx # marginal effect of sqft on price
+elasticity=DpriceDsqft*sqftx/pricex 
+b1; b2; DpriceDsqft; elasticity #prints results
+```
+
+
+Nos gustaría ahora dibujar un diagrama de dispersión y ver cómo la función cuadrática se ajusta a los datos. El siguiente fragmento de código proporciona dos alternativas para construir dicho gráfico. El primero simplemente dibuja la función cuadrática en el diagrama de dispersión, usando la función R curve(); El segundo utiliza las lines de función, lo que requiere ordenar el conjunto de datos en valores crecientes de `sqft` antes de que se evalúe el modelo de regresión, de modo que los valores ajustados resultantes también salgan en el mismo orden.
+
+```{r}
+mod31 <- lm(price~I(sqft^2), data=br)
+plot(br$sqft, br$price, xlab="Total square feet", 
+     ylab="Sale price, $", col="grey")
+#add the quadratic curve to the scatter plot:
+curve(b1+b2*x^2, col="red", add=TRUE) 
+```
+
+
+Una forma alternativa de dibujar la curva ajustada:
+
+```{r}
+ordat <- br[order(br$sqft), ] #sorts the dataset after `sqft`
+mod31 <- lm(price~I(sqft^2), data=ordat)
+plot(br$sqft, br$price, 
+     main="Dataset ordered after 'sqft' ", 
+     xlab="Total square feet", 
+     ylab="Sale price, $", col="grey")
+lines(fitted(mod31)~ordat$sqft, col="red")
+```
+
+
+El modelo log-lineal hace una regresión logarítmica de la variable dependiente en una expresión lineal de la variable independiente (a menos que se especifique lo contrario, la notación log natural, siguiendo una convención habitual en economía):
+
+$$log(y_i) = β_1+β_2 x_i + e_i \hspace{35pt}................................(6)$$
+
+Una de las razones para usar el logaritmo de una variable independiente es hacer su distribución más cercana a la distribución normal. Dibujemos los histogramas de price precio y log(price) para compararlos (ver Figura 2.5). Se puede notar que el log está más cerca de la distribución normal.
+
+```{r}
+hist(br$price, col='grey')
+hist(log(br$price), col='grey')
+```
+
+
+
+
+## Estimación de intervalos y pruebas de hipótesis
+
+
+```{r}
+library(xtable)
+library(PoEdata)
+library(knitr)
+```
+
+
+Hasta ahora, solo estimamos un número para un parámetro de regresión como  β2. 
+Esta estimación, sin embargo, no da ninguna indicación de su fiabilidad, ya que
+es sólo una realización de la variable aleatoria.  b2. Una estimación de 
+intervalo, que también se conoce como intervalo de confianza, es un intervalo 
+centrado en un valor estimado, que incluye el parámetro verdadero con una 
+probabilidad dada, digamos 95%. Un coeficiente del modelo de regresión lineal 
+como  b2 se distribuye normalmente con su media igual al parámetro de población 
+β2 y una varianza que depende de la varianza de la población  σ2  y el tamaño 
+de la muestra:
+
+$$$$
+
+### La distribución estimada de los coeficientes de regresión
+
+Ecuación  1  da la distribución teórica de un coeficiente de regresión lineal,
+una distribución que no es muy útil ya que requiere la varianza poblacional 
+desconocida  σ2 . Si reemplazamos  σ2  con una varianza estimada  σ^2 dado en
+Ecuación  2, la distribución estandarizada de  b2 se convierte en un  t 
+distribución con  N−2  grados de libertad.
+
+
+
+
+
+
+
+
+
+
 
 
 
