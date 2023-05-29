@@ -6,7 +6,7 @@ output:
   #rmdformats::downcute:
   rmdformats::readthedown:
   html_document:
-    number_sections: 2
+    number_sections: 3
     toc: TRUE
     toc_float: TRUE
     #theme: journal
@@ -103,7 +103,7 @@ donde el subíndice i se ha omitido por simplicidad
 
 
 
-```{r}
+```{r render = pander::pander}
 library(PoEdata)
 mod1 <- lm(food_exp ~ income, data = food)
 b1 <- coef(mod1)[[1]]
@@ -135,12 +135,12 @@ names(smod1)
 
 Para recuperar un resultado en particular, simplemente refiérase a él con el nombre del objeto, seguido del signo $\$$ y el nombre del resultado que desea recuperar. Por ejemplo, si queremos el vector de coeficientes de mod1, nos referimos a él como `mod1$coefficients` y `smod1$coefficients` `mod1$coefficients`:
 
-```{r}
+```{r render = pander::pander}
 mod1$coefficients
 ```
 
 
-```{r}
+```{r render = pander::pander}
 smod1$coefficients
 ```
 
@@ -151,11 +151,11 @@ Sin embargo, como hemos visto antes, algunos de estos resultados se pueden recup
 
 Los parámetros de regresión estimados, $b_1$ y $b_2$ nos permiten predecir el gasto alimentario esperado para cualquier ingreso dado. Todo lo que necesitamos hacer es conectar los valores de los parámetros estimados y el ingreso dado en una ecuación como Ecuación  2. Por ejemplo, el valor esperado de  food_exp  para un ingreso de $2000 se calcula en la Ecuación  4. (Recuerde dividir el ingreso por 100, ya que los datos para la variable  income  está en cientos de dólares)
 
-$$\hat{foodexp} = 83.416002 + 10.209643∗20 = 287.608861 \hspace{40pt}................................(4)$$
+$$\hat{foodexp} = 83.416002 + 10.209643∗20 = 287.608861 \hspace{35pt}................................(4)$$
 
 R, sin embargo, hace estos cálculos por nosotros con su función llamada predict(). Extendamos ligeramente el ejemplo a más de un ingreso para el cual predecimos el gasto en alimentos, digamos ingresos = $\$$ 2000, $\$$ 2500 y $\$$ 2700. La función predict() en R requiere que los nuevos valores de las variables independientes se organicen bajo una forma particular, llamada marco de datos. Incluso cuando solo queremos predecir un ingreso, necesitamos la misma estructura de marco de datos. En R, un conjunto de números se mantiene unido usando la estructura c(). La siguiente secuencia muestra este ejemplo.
 
-```{r}
+```{r render = pander::pander}
 # library(PoEdata) (load the data package if you have not done so yet)
 mod1 <- lm(food_exp~income, data=food)
 newx <- data.frame(income = c(20, 25, 27))
@@ -163,6 +163,36 @@ yhat <- predict(mod1, newx)
 names(yhat) <- c("income=$2000", "$2500", "$2700") 
 yhat  # prints the result
 ```
+
+
+### Muestras repetidas para evaluar los coeficientes de regresión
+
+Los coeficientes de regresión $b_1$ y $b_2$ son variables aleatorias, porque 
+dependen de la muestra. Construyamos una serie de submuestras aleatorias a 
+partir de los datos de alimentos y volvamos a calcular $b_1$ y $b_2$. Se puede
+construir una submuestra aleatoria usando la función sample(), como ilustra el
+siguiente ejemplo solo para $b_2$
+
+```{r}
+N <- nrow(food) # returns the number of observations in the dataset
+C <- 50         # desired number of subsamples
+S <- 38         # desired sample size
+
+sumb2 <- 0
+for (i in 1:C){   # a loop over the number of subsamples
+  set.seed(3*i)   # a different seed for each subsample  
+  subsample <- food[sample(1:N, size=S, replace=TRUE), ]
+  mod2 <- lm(food_exp~income, data=subsample)
+  #sum b2 for all subsamples:
+  sumb2 <- sumb2 + coef(mod2)[[2]]
+}
+print(sumb2/C, digits = 3)
+```
+
+
+The result,  $b_2$=  9.88, is the average of 50 estimates of  $b_2$.
+
+
 
 
 
